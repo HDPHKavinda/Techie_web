@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Circuit Lab — Techie Heshan</title>
+<meta name="description" content="Free, interactive drag-and-drop circuit simulator. Build ESP32 circuits in your browser — wire components, write code, simulate instantly.">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0A;--bg2:#0E0E0E;--sf:#111;--sf2:#161616;--sf3:#1B1B1B;
+  --ln:#232323;--ln2:#2E2E2E;--ln3:#3A3A3A;
+  --tx:#F5F5F5;--mt:#9A9A9A;--mt2:#6B6B6B;--sv:#C8C8C8;
+  --gs:rgba(255,255,255,.34);
+  --d:'Space Grotesk',system-ui,sans-serif;
+  --b:'Inter',system-ui,sans-serif;
+  --m:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:var(--b);overflow:hidden;height:100vh}
+::selection{background:#F5F5F5;color:#0A0A0A}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--ln2);border-radius:4px}
+
+/* Top bar */
+.topbar{height:48px;border-bottom:1px solid var(--ln);background:var(--bg2);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:10}
+.logo{display:flex;align-items:center;gap:9px;font-family:var(--d);font-weight:700;letter-spacing:.06em;font-size:.9rem;text-decoration:none;color:var(--tx)}
+.logo svg{display:block}
+.topbar .sep{width:1px;height:28px;background:var(--ln2)}
+.topbar .title{font-family:var(--d);font-weight:700;font-size:.85rem;letter-spacing:.03em}
+.topbar .sub{font-family:var(--m);font-size:.65rem;letter-spacing:.12em;color:var(--mt2);text-transform:uppercase}
+.topbar .spacer{flex:1}
+.topbar .stat{font-family:var(--m);font-size:.7rem;color:var(--mt2)}
+.t-btn{background:none;border:1px solid var(--ln2);border-radius:7px;padding:5px 12px;color:var(--mt);font-family:var(--m);font-size:.6rem;letter-spacing:.06em;cursor:pointer;transition:border-color .15s,color .15s}
+.t-btn:hover{border-color:var(--gs);color:var(--tx)}
+.run-btn{background:var(--tx);border:none;border-radius:7px;padding:5px 16px;color:#0A0A0A;font-family:var(--m);font-weight:600;font-size:.6rem;letter-spacing:.06em;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.run-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(255,255,255,.18)}
+.run-btn.stop{background:var(--mt)}
+.back-link{font-family:var(--m);font-size:.7rem;color:var(--mt);text-decoration:none;transition:color .15s;display:flex;align-items:center;gap:6px}
+.back-link:hover{color:var(--tx)}
+
+/* Main layout */
+.main{display:flex;height:calc(100vh - 48px)}
+
+/* Palette */
+.palette{width:180px;border-right:1px solid var(--ln);background:var(--bg2);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.p-head{padding:10px 14px;border-bottom:1px solid var(--ln);font-family:var(--m);font-size:.55rem;letter-spacing:.16em;color:var(--mt2);text-transform:uppercase}
+.p-scroll{flex:1;overflow:auto;padding:6px 0}
+.p-cat{padding:8px 14px 3px;font-family:var(--m);font-size:.5rem;letter-spacing:.16em;color:var(--mt2);text-transform:uppercase}
+.p-item{margin:0 8px 5px;padding:8px 10px;background:var(--sf);border:1px solid var(--ln);border-radius:8px;cursor:grab;display:flex;align-items:center;gap:8px;font-family:var(--d);font-weight:600;font-size:.7rem;transition:border-color .15s}
+.p-item:hover{border-color:var(--gs)}
+.p-item .ico{font-size:.7rem;filter:grayscale(1)}
+.p-help{padding:10px 12px;border-top:1px solid var(--ln);font-family:var(--m);font-size:.45rem;letter-spacing:.08em;color:var(--mt2);line-height:1.9;text-transform:uppercase}
+
+/* Canvas */
+.canvas-wrap{flex:1;position:relative;overflow:hidden}
+.canvas-wrap svg{position:absolute;inset:0;width:100%;height:100%}
+.empty-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none}
+.empty-msg span{font-family:var(--m);font-size:.6rem;letter-spacing:.14em;color:var(--mt2);text-transform:uppercase}
+.empty-msg small{font-family:var(--m);font-size:.5rem;color:var(--ln3)}
+
+/* Right panel */
+.right{width:290px;border-left:1px solid var(--ln);background:var(--bg2);display:flex;flex-direction:column;flex-shrink:0}
+.tabs{display:flex;border-bottom:1px solid var(--ln)}
+.tabs button{flex:1;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--mt2);font-family:var(--m);font-size:.55rem;letter-spacing:.1em;padding:10px 0;text-transform:uppercase;cursor:pointer}
+.tabs button.on{background:var(--sf);border-bottom-color:var(--tx);color:var(--tx)}
+.code-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.code-bar{display:flex;align-items:center;gap:6px;padding:7px 12px;border-bottom:1px solid var(--ln);background:var(--sf)}
+.code-bar .dot{width:8px;height:8px;border-radius:50%}
+.code-bar .fname{font-family:var(--m);font-size:.65rem;color:var(--mt);margin-left:4px}
+.code-area textarea{flex:1;resize:none;background:#080808;border:none;padding:12px;color:var(--tx);font-family:var(--m);font-size:.68rem;line-height:1.7;outline:none;width:100%}
+.serial{height:180px;border-top:1px solid var(--ln);display:flex;flex-direction:column}
+.serial-head{display:flex;align-items:center;gap:6px;padding:7px 12px;border-bottom:1px solid var(--ln);background:var(--sf)}
+.serial-head .dot{width:6px;height:6px;border-radius:50%}
+.serial-head .dot.live{background:#fff;box-shadow:0 0 6px #fff}
+.serial-head .dot.off{background:var(--mt2)}
+.serial-head span{font-family:var(--m);font-size:.5rem;letter-spacing:.1em;color:var(--mt2);text-transform:uppercase}
+.serial-out{flex:1;overflow:auto;padding:6px 12px;font-family:var(--m);font-size:.62rem;line-height:1.7;background:#080808}
+.serial-out .line{color:var(--mt)}
+.serial-out .line.hot{color:var(--tx)}
+.serial-out .line b{color:var(--sv);font-weight:400;margin-right:8px}
+
+.presets-panel{flex:1;overflow:auto;padding:10px}
+.preset-card{padding:12px 14px;background:var(--sf);border:1px solid var(--ln);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.preset-card:hover{border-color:var(--gs)}
+.preset-card h4{font-family:var(--d);font-weight:700;font-size:.75rem;margin-bottom:3px}
+.preset-card p{font-family:var(--m);font-size:.55rem;color:var(--mt2)}
+
+.props-panel{flex:1;overflow:auto;padding:14px}
+.props-panel .p-title{font-family:var(--d);font-weight:700;font-size:.8rem;margin-bottom:4px}
+.props-panel .p-id{font-family:var(--m);font-size:.5rem;color:var(--mt2);letter-spacing:.1em;margin-bottom:14px}
+.prop-label{font-family:var(--m);font-size:.5rem;letter-spacing:.1em;color:var(--mt2);text-transform:uppercase;display:block;margin-bottom:3px}
+.prop-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.prop-row input[type=range]{flex:1;accent-color:var(--sv)}
+.prop-val{font-family:var(--m);font-size:.6rem;color:var(--sv);min-width:36px;text-align:right}
+.del-btn{margin-top:8px;width:100%;background:none;border:1px solid var(--ln2);border-radius:7px;padding:8px;color:var(--mt);font-family:var(--m);font-size:.55rem;letter-spacing:.06em;cursor:pointer;text-align:center}
+.del-btn:hover{border-color:var(--gs);color:var(--tx)}
+.no-sel{color:var(--mt2);font-family:var(--m);font-size:.55rem;text-align:center;padding-top:40px}
+
+@keyframes fadeIn{from{opacity:0;transform:translateX(-3px)}to{opacity:1;transform:none}}
+@media (max-width:900px){
+  .palette{width:140px}
+  .right{width:240px}
+}
+@media (max-width:640px){
+  .palette{display:none}
+  .right{width:100%;position:absolute;bottom:0;height:50vh;z-index:5}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a class="logo" href="index.html">
+    <svg width="22" height="22" viewBox="0 0 26 26" fill="none"><rect x="5" y="5" width="16" height="16" rx="4" stroke="#F5F5F5" stroke-width="1.6"/><circle cx="13" cy="13" r="3" fill="#F5F5F5"/><path d="M9 1v4M13 1v4M17 1v4M9 21v4M13 21v4M17 21v4M1 9h4M1 13h4M1 17h4M21 9h4M21 13h4M21 17h4" stroke="#6B6B6B" stroke-width="1.4"/></svg>
+  </a>
+  <div class="sep"></div>
+  <div>
+    <div class="title">CIRCUIT LAB</div>
+    <div class="sub">Interactive Simulator</div>
+  </div>
+  <div class="spacer"></div>
+  <a class="back-link" href="index.html">← Back to site</a>
+</div>
+
+<div class="main">
+  <div id="app" style="display:contents">
+    <noscript><div style="padding:40px;text-align:center;color:#9A9A9A;font-family:monospace">JavaScript is required to run the Circuit Lab simulator.</div></noscript>
+  </div>
+</div>
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react" src="circuit-lab-v2.jsx"></script>
+</body>
+</html>

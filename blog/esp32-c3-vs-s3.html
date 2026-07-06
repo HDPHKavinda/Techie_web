@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP32-C3 vs ESP32-S3 — Techie Heshan</title>
+<meta name="description" content="A plain-language comparison of the C3 and S3.">
+<meta property="og:title" content="ESP32-C3 vs ESP32-S3 — Techie Heshan">
+<meta property="og:description" content="A plain-language comparison of the C3 and S3.">
+<meta name="theme-color" content="#0A0A0A">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="boot" id="boot">
+  <div class="boot-scope"><svg viewBox="0 0 420 120" preserveAspectRatio="none" aria-hidden="true">
+  <g class="grid-h"><line x1="0" y1="30" x2="420" y2="30"/><line x1="0" y1="60" x2="420" y2="60"/><line x1="0" y1="90" x2="420" y2="90"/></g>
+  <g class="grid-v"><line x1="60" y1="0" x2="60" y2="120"/><line x1="140" y1="0" x2="140" y2="120"/><line x1="220" y1="0" x2="220" y2="120"/><line x1="300" y1="0" x2="300" y2="120"/><line x1="360" y1="0" x2="360" y2="120"/></g>
+  <path class="trace" d="M0 60 L40 60 L40 30 L100 30 L100 90 L160 90 L160 30 L240 30 L240 90 L300 90 L300 30 L360 30 L360 60 L420 60"/>
+</svg></div>
+  <div class="boot-text">TECHIE HESHAN <b>&middot; BOOTING</b><span class="cur-b"></span></div>
+</div>
+<nav>
+  <div class="nav-in">
+    <a class="logo" href="../index.html" aria-label="Techie Heshan home"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="5" y="5" width="16" height="16" rx="4" stroke="#F5F5F5" stroke-width="1.6"/><circle cx="13" cy="13" r="3" fill="#F5F5F5"/><path d="M9 1v4M13 1v4M17 1v4M9 21v4M13 21v4M17 21v4M1 9h4M1 13h4M1 17h4M21 9h4M21 13h4M21 17h4" stroke="#6B6B6B" stroke-width="1.4"/></svg>TECHIE&nbsp;HESHAN</a>
+    <div class="nav-links" id="navLinks">
+      <a href="../learn.html">Learn</a>
+      <a href="../simulate.html">Simulate</a>
+      <a href="../projects.html">Projects</a>
+      <a href="../blog.html" class="active">Blog</a>
+      <a href="../resources.html">Resources</a>
+      <a href="../about.html">About</a>
+    </div>
+    <div class="nav-cta">
+      <a class="yt-link" href="https://www.youtube.com/@techieheshan" target="_blank" rel="noopener"><span class="rec"></span>YouTube</a>
+      <a class="hire-btn magnetic" href="../hire.html">Hire me</a>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">&#9776;</button>
+    </div>
+  </div>
+</nav>
+<header class="page-hero">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">Home</a><i>/</i><a href="../blog.html">Bench Notes</a><i>/</i><span>Guide</span></div>
+    <h1>ESP32-C3 vs ESP32-S3: which one should your next build use?</h1>
+    <div class="art-meta">
+      <span>PUBLISHED <b>JUN 28, 2026</b></span>
+      <span>READING TIME <b>5 MIN</b></span>
+      <span>TAG <b>GUIDE</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap-narrow" style="padding-top:64px">
+  <article class="prose">
+    <p>Every week someone asks me which ESP32 to buy, and every week the honest answer is &ldquo;it depends&rdquo; &mdash; so here is the depends, written down. The classic WROOM-32 is still fine, but for new designs the real decision in 2026 is between the little C3 and the muscular S3. They are much less interchangeable than the naming suggests.</p>
+
+<h2>The short version</h2>
+<p>The <strong>C3</strong> is a single RISC-V core at 160&nbsp;MHz with about 400&nbsp;KB of SRAM, Wi-Fi 4 and Bluetooth 5 LE, and &mdash; the killer feature &mdash; native USB serial/JTAG on the chip itself. It is tiny, it is cheap, and boards like the C3 SuperMini cost less than a decent coffee. The <strong>S3</strong> is a dual-core Xtensa LX7 at 240&nbsp;MHz with 512&nbsp;KB of SRAM, optional PSRAM in the module, USB OTG, vector instructions for on-device AI, and enough GPIO to drive cameras and parallel LCDs.</p>
+
+<table class="spec">
+  <tr><th></th><th>ESP32-C3</th><th>ESP32-S3</th></tr>
+  <tr><td>CPU</td><td>1&times; RISC-V @ 160 MHz</td><td>2&times; LX7 @ 240 MHz</td></tr>
+  <tr><td>SRAM</td><td>~400 KB</td><td>512 KB (+ PSRAM options)</td></tr>
+  <tr><td>Radio</td><td>Wi-Fi 4 + BLE 5</td><td>Wi-Fi 4 + BLE 5</td></tr>
+  <tr><td>USB</td><td>Serial/JTAG (flash &amp; debug)</td><td>Full OTG (host &amp; device)</td></tr>
+  <tr><td>GPIO</td><td>~22 pins</td><td>~45 pins</td></tr>
+  <tr><td>Special</td><td>Tiny, very cheap</td><td>Camera/LCD interfaces, AI vector ops</td></tr>
+  <tr><td>Best for</td><td>Sensors, buttons, small nodes</td><td>Cameras, displays, audio, USB devices</td></tr>
+</table>
+
+<h2>When the C3 wins</h2>
+<p>Sensor nodes, smart buttons, relays, the little always-on things a smart home is actually made of. A C3 SuperMini soldered behind a light switch is doing exactly the same job an S3 would &mdash; for a third of the price and half the standby power. If your firmware is &ldquo;read a thing, publish over MQTT, sleep&rdquo;, buying an S3 is just donating money to a chip that will spend its life idle.</p>
+
+<h2>When the S3 wins</h2>
+<p>The moment pixels, sound or USB enter the project. Camera streaming, a touch display dashboard, a BadUSB-style HID gadget, TinyML keyword spotting &mdash; the S3 does all of these comfortably and the C3 does none of them well. The second core also matters more than benchmarks suggest: keeping Wi-Fi housekeeping on one core while your timing-critical code owns the other is what makes LED and audio projects stop glitching.</p>
+
+<h2>My rule</h2>
+<blockquote>Default to the C3 and let the project argue you up to the S3 &mdash; never the other way around.</blockquote>
+<p>Nine of the last ten nodes I deployed at home are C3s. The tenth is an S3 driving a camera &mdash; because that one genuinely needed it.</p>
+
+    <div class="support reveal">
+      <p><b>Useful?</b> Posts like this come out weekly &mdash; the newsletter gets you each one, free.</p>
+      <span class="s-actions">
+        <a class="btn btn-ghost btn-sm magnetic" href="#">&#9749; Buy me a coffee</a>
+      </span>
+    </div>
+
+    <div class="comments" id="comments">
+  <div class="comments-head">
+    <h3>Discussion</h3>
+    <span class="count" id="cCount">0 comments</span>
+  </div>
+  <form class="c-form" id="cForm" data-scope="blog/esp32-c3-vs-s3" onsubmit="return false">
+    <input type="text" name="name" placeholder="Your name" maxlength="40" required>
+    <textarea name="msg" placeholder="Share your build, ask a question, correct me &mdash; all welcome." maxlength="900" required></textarea>
+    <button type="submit" class="btn btn-solid btn-sm magnetic">Post comment</button>
+  </form>
+  <div class="c-list" id="cList"></div>
+  <p style="color:var(--muted2);font-size:.76rem;margin-top:18px;font-family:var(--mono);letter-spacing:.06em">DEMO MODE &mdash; stored in your browser. Wire to Giscus or Cusdis for real cross-device comments.</p>
+</div>
+
+  </article>
+</div>
+
+<section id="subscribe" style="padding-top:0">
+  <div class="wrap">
+    <div class="news news-sm reveal">
+      <div class="kick" style="justify-content:center;display:inline-flex">[ PWR ] <i style="margin:0 6px">//</i> NEWSLETTER</div>
+      <h2>Bench Notes, in your inbox.</h2>
+      <p>One practical build, repair tip or teardown every week. No spam, no fluff &mdash; just things you can solder.</p>
+      <div class="news-row">
+        <input type="email" id="nlEmail" placeholder="you@example.com" aria-label="Email address">
+        <button class="btn btn-solid magnetic" id="nlBtn">Subscribe</button>
+      </div>
+      <div class="news-note" id="nlNote">Free forever &middot; Unsubscribe anytime</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <div class="logo" style="margin-bottom:18px"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="5" y="5" width="16" height="16" rx="4" stroke="#F5F5F5" stroke-width="1.6"/><circle cx="13" cy="13" r="3" fill="#F5F5F5"/><path d="M9 1v4M13 1v4M17 1v4M9 21v4M13 21v4M17 21v4M1 9h4M1 13h4M1 17h4M21 9h4M21 13h4M21 17h4" stroke="#6B6B6B" stroke-width="1.4"/></svg>TECHIE&nbsp;HESHAN</div>
+        <p class="f-about">Practical electronics education &mdash; microcontrollers, IoT and micro-soldering, taught through real builds. Free for everyone, funded by sponsors, partners and client work.</p>
+        <div class="f-social">
+          <!-- EDIT: replace # with your real social URLs -->
+          <a href="https://www.youtube.com/@techieheshan" target="_blank" rel="noopener" aria-label="YouTube"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3.5"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" target="_blank" rel="noopener" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="7.5" y1="10" x2="7.5" y2="17"/><circle cx="7.5" cy="7" r="1" fill="currentColor" stroke="none"/><path d="M11.5 17v-4.5a2.5 2.5 0 0 1 5 0V17M11.5 10.5v6.5"/></svg></a>
+          <a href="#" target="_blank" rel="noopener" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://github.com/techieheshan" target="_blank" rel="noopener" aria-label="GitHub"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4 1.5-4-2-6-2m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6 0-1.2-.4-2.3-1.2-3.2.4-1.2.3-2.5-.2-3.6 0 0-1-.3-3.4 1.3a11.6 11.6 0 0 0-6.2 0C6.6 3.4 5.6 3.7 5.6 3.7c-.5 1.1-.6 2.4-.2 3.6A4.7 4.7 0 0 0 4.2 10c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.3-.5 2V22"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h4>Learn</h4>
+        <a href="../learn.html#esp32">ESP32 Mastery</a>
+        <a href="../learn.html#arduino">Arduino Foundations</a>
+        <a href="../learn.html#iot">IoT &amp; Smart Home</a>
+        <a href="../learn.html#solder">Micro-Soldering</a>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="../simulate.html">Simulate</a>
+      <a href="../projects.html">Projects</a>
+        <a href="../blog.html">Bench Notes</a>
+        <a href="https://github.com/techieheshan" target="_blank" rel="noopener">GitHub</a>
+        <a href="../resources.html">Resources</a>
+      </div>
+      <div>
+        <h4>Work with me</h4>
+        <a href="../hire.html">Hire me</a>
+        <a href="../sponsor.html">Sponsor a build</a>
+        <a href="../hire.html#contact">&#9749; Buy me a coffee</a>
+        <a href="../hire.html#contact">Contact</a>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>&copy; <span id="yr">2026</span> TECHIE HESHAN</span>
+      <span><a href="../legal.html#disclosure">Affiliate disclosure</a> &middot; <a href="../legal.html#privacy">Privacy</a></span>
+      <span>BUILT IN COLOMBO &middot; READ WORLDWIDE</span>
+    </div>
+  </div>
+</footer>
+<script src="../assets/main.js"></script>
+</body>
+</html>
