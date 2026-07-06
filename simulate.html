@@ -136,6 +136,22 @@ body{background:var(--bg);color:var(--tx);font-family:var(--b);overflow:hidden;h
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel" data-presets="react" src="circuit-lab-v2.jsx"></script>
+<script>
+// Babel Standalone's implicit data-presets scanning can't set the
+// "classic" JSX runtime, and the default "automatic" runtime injects
+// `import ... from "react/jsx-runtime"`, which fails outside a module.
+// So fetch + transform explicitly with the classic runtime instead.
+fetch('circuit-lab-v2.jsx')
+  .then(r => r.text())
+  .then(src => {
+    const { code } = Babel.transform(src, {
+      presets: [['react', { runtime: 'classic' }]],
+      filename: 'circuit-lab-v2.jsx',
+    });
+    const s = document.createElement('script');
+    s.text = code;
+    document.body.appendChild(s);
+  });
+</script>
 </body>
 </html>
