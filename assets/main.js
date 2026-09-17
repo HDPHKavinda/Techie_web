@@ -119,15 +119,16 @@
      An AudioContext is attempted automatically. Mobile browsers can require a
      first touch before allowing sound, so that same first touch retries once. */
   var morseStatus = document.getElementById('morseStatus');
+  var morsePlay = document.getElementById('morsePlay');
   if (morseStatus && !reduced) {
     var morseStarted = false;
-    var playH = function () {
-      if (morseStarted) return;
+    var playH = function (replay) {
+      if (morseStarted && !replay) return;
       var AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) { morseStatus.lastChild.nodeValue = 'Morse unavailable on this browser'; return; }
       var ctx = new AudioCtx();
       var begin = function () {
-        if (morseStarted) return;
+        if (morseStarted && !replay) return;
         morseStarted = true;
         var t = ctx.currentTime + 0.08;
         for (var letter = 0; letter < 3; letter++) {
@@ -144,13 +145,17 @@
           }
         }
         morseStatus.lastChild.nodeValue = 'H · H · H transmitted';
+        if (morsePlay) morsePlay.lastChild.nodeValue = ' Play again';
       };
       ctx.resume().then(begin).catch(function () {
         morseStatus.lastChild.nodeValue = 'Sound will begin with your next touch';
       });
     };
     setTimeout(playH, 2150);
-    document.addEventListener('pointerdown', playH, { once: true, passive: true });
+    document.addEventListener('pointerdown', function (event) {
+      if (!event.target.closest('#morsePlay')) playH();
+    }, { once: true, passive: true });
+    if (morsePlay) morsePlay.addEventListener('click', function () { playH(true); });
   }
 
   /* ---------- STAT COUNTUP ---------- */
