@@ -117,9 +117,9 @@
 
   /* ---------- NFC ARRIVAL MORSE: H × 3 ----------
      An AudioContext is attempted automatically. Mobile browsers can require a
-     first touch before allowing sound, so that same first touch retries once. */
+     first touch before allowing sound, so a tap on the profile surface retries. */
   var morseStatus = document.getElementById('morseStatus');
-  var morsePlay = document.getElementById('morsePlay');
+  var morseSurface = document.querySelector('[data-morse-surface]');
   if (morseStatus && !reduced) {
     var morseStarted = false;
     var playH = function (replay) {
@@ -145,17 +145,15 @@
           }
         }
         morseStatus.lastChild.nodeValue = 'H · H · H transmitted';
-        if (morsePlay) morsePlay.lastChild.nodeValue = ' Play again';
       };
       ctx.resume().then(begin).catch(function () {
         morseStatus.lastChild.nodeValue = 'Sound will begin with your next touch';
       });
     };
     setTimeout(playH, 2150);
-    document.addEventListener('pointerdown', function (event) {
-      if (!event.target.closest('#morsePlay')) playH();
-    }, { once: true, passive: true });
-    if (morsePlay) morsePlay.addEventListener('click', function () { playH(true); });
+    if (morseSurface) morseSurface.addEventListener('pointerdown', function (event) {
+      if (!event.target.closest('a,button')) playH(true);
+    }, { passive: true });
   }
 
   /* ---------- STAT COUNTUP ---------- */
