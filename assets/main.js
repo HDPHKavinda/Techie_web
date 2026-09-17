@@ -115,6 +115,44 @@
     });
   }
 
+  /* ---------- NFC ARRIVAL MORSE: H × 3 ----------
+     An AudioContext is attempted automatically. Mobile browsers can require a
+     first touch before allowing sound, so that same first touch retries once. */
+  var morseStatus = document.getElementById('morseStatus');
+  if (morseStatus && !reduced) {
+    var morseStarted = false;
+    var playH = function () {
+      if (morseStarted) return;
+      var AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) { morseStatus.lastChild.nodeValue = 'Morse unavailable on this browser'; return; }
+      var ctx = new AudioCtx();
+      var begin = function () {
+        if (morseStarted) return;
+        morseStarted = true;
+        var t = ctx.currentTime + 0.08;
+        for (var letter = 0; letter < 3; letter++) {
+          for (var dot = 0; dot < 4; dot++) {
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            var at = t + (letter * 1.18) + (dot * 0.19);
+            osc.type = 'sine'; osc.frequency.value = 660;
+            gain.gain.setValueAtTime(0.0001, at);
+            gain.gain.exponentialRampToValueAtTime(0.16, at + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.115);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(at); osc.stop(at + 0.13);
+          }
+        }
+        morseStatus.lastChild.nodeValue = 'H · H · H transmitted';
+      };
+      ctx.resume().then(begin).catch(function () {
+        morseStatus.lastChild.nodeValue = 'Sound will begin with your next touch';
+      });
+    };
+    setTimeout(playH, 2150);
+    document.addEventListener('pointerdown', playH, { once: true, passive: true });
+  }
+
   /* ---------- STAT COUNTUP ---------- */
   document.querySelectorAll('[data-count]').forEach(function (n) {
     var target = parseFloat(n.getAttribute('data-count'));
